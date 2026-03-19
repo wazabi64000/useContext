@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Guide React useContext - Gestion Utilisateur</title>
+<title>Guide Débutant React useContext - Gestion Utilisateur</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
@@ -24,6 +24,7 @@ body {
 h1 {
     text-align: center;
     font-size: 36px;
+    margin-bottom: 10px;
 }
 
 h2 {
@@ -31,6 +32,22 @@ h2 {
     border-left: 5px solid #6c5ce7;
     padding-left: 15px;
     color: #341f97;
+}
+
+h3 {
+    color: #3c6382;
+}
+
+p {
+    margin: 10px 0;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
 }
 
 .card {
@@ -49,6 +66,7 @@ code {
     border-radius: 8px;
     margin-top: 15px;
     white-space: pre-wrap;
+    font-size: 14px;
 }
 
 .highlight {
@@ -58,9 +76,7 @@ code {
     margin: 15px 0;
 }
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
@@ -68,65 +84,79 @@ code {
 <h1>Guide React useContext - Gestion Utilisateur</h1>
 
 <div class="highlight">
-Objectif : comprendre et implémenter useContext dans un projet React (Vite) pour gérer un utilisateur global.
+Objectif : apprendre à gérer un utilisateur global dans React avec useContext, étape par étape, pour débutants complets.
 </div>
 
-<h2>1. Pourquoi useContext ?</h2>
+<h2>1. Théorie : pourquoi useContext ?</h2>
 
 <div class="card">
 <p>
-useContext permet de partager des données globales (comme un utilisateur connecté) sans passer par les props.
+Dans une application React, il arrive souvent que plusieurs composants aient besoin de connaître l’état d’un utilisateur (par exemple : connecté ou non, nom, email).  
+Sans useContext, il faudrait passer ces informations depuis un composant parent à chaque enfant (prop drilling), ce qui devient compliqué dans des applications larges.
 </p>
 
+<p>useContext permet :</p>
 <ul>
-<li>Évite le "prop drilling"</li>
-<li>Centralise l’état global</li>
-<li>Facilite la maintenance</li>
+<li>de partager des données globales facilement</li>
+<li>de simplifier le code et éviter de passer les props partout</li>
+<li>de centraliser l’état (user) et les fonctions pour le modifier</li>
 </ul>
 </div>
 
-<h2>2. Initialisation projet Vite</h2>
+<h2>2. Initialisation du projet Vite</h2>
 
 <div class="card">
+<p>Pour commencer un projet React moderne, on utilise Vite :</p>
+
 <code>
-npm create vite@latest
-cd projet
+// 1. Crée un projet vite
+npm create vite@latest mon-projet-react
+
+// 2. Se déplacer dans le dossier du projet
+cd mon-projet-react
+
+// 3. Installer les dépendances
 npm install
+
+// 4. Lancer le serveur de développement
 npm run dev
 </code>
+
+<p>Explication :</p>
+<ul>
+<li><strong>npm create vite@latest</strong> : initialise un nouveau projet React</li>
+<li><strong>npm install</strong> : installe les packages nécessaires</li>
+<li><strong>npm run dev</strong> : lance le projet dans le navigateur</li>
+</ul>
 </div>
 
----
-
-<h2>3. Exemple 1 — Création du Context</h2>
+<h2>3. Exemple 1 : créer un Context</h2>
 
 <div class="card">
+<p>On commence par créer un contexte global pour l’utilisateur.</p>
 
 <code>
 // src/context/UserContext.jsx
 
 import { createContext } from "react";
 
-/*
-createContext permet de créer un contexte global
-ici on initialise avec null (aucun utilisateur)
-*/
+// createContext crée un "espace global"
+// Ici, on initialise le contexte avec null (aucun utilisateur connecté)
 export const UserContext = createContext(null);
 </code>
 
-<p><strong>Explication :</strong></p>
+<p>Explication :</p>
 <ul>
-<li>createContext crée un espace global</li>
-<li>null = pas encore connecté</li>
+<li>On importe <strong>createContext</strong> depuis React</li>
+<li>On crée un contexte appelé <strong>UserContext</strong></li>
+<li>La valeur initiale est <strong>null</strong> car l’utilisateur n’est pas encore connecté</li>
 </ul>
-
 </div>
 
----
-
-<h2>4. Exemple 2 — Provider global</h2>
+<h2>4. Exemple 2 : créer le Provider</h2>
 
 <div class="card">
+<p>Le Provider enveloppe notre application et permet de partager l’état utilisateur.</p>
 
 <code>
 // src/context/UserProvider.jsx
@@ -134,50 +164,45 @@ export const UserContext = createContext(null);
 import { useState } from "react";
 import { UserContext } from "./UserContext";
 
-/*
-Provider = composant qui va encapsuler l'application
-*/
+// Composant Provider
 export const UserProvider = ({ children }) => {
 
-    // état utilisateur global
+    // useState pour stocker les informations de l'utilisateur
     const [user, setUser] = useState(null);
 
     return (
-        /*
-        value = données accessibles partout
-        */
+        // <UserContext.Provider> rend user et setUser accessibles dans toute l'application
         &lt;UserContext.Provider value={{ user, setUser }}&gt;
-            {children}
+            {children} // Tous les composants enfants
         &lt;/UserContext.Provider&gt;
     );
 };
 </code>
 
-<p><strong>Points clés :</strong></p>
+<p>Explication détaillée :</p>
 <ul>
-<li>useState stocke l’utilisateur</li>
-<li>Provider rend accessible user et setUser</li>
+<li><strong>useState</strong> : permet de créer une variable d’état reactive</li>
+<li><strong>user</strong> : l’état actuel (informations utilisateur)</li>
+<li><strong>setUser</strong> : fonction pour mettre à jour l’utilisateur</li>
+<li><strong>value={{ user, setUser }}</strong> : données accessibles par tous les composants qui consomment ce contexte</li>
+<li>{'{children}'} : représente tous les composants React enveloppés par le Provider</li>
 </ul>
-
 </div>
 
----
-
-<h2>5. Exemple 3 — Injection dans App</h2>
+<h2>5. Exemple 3 : envelopper l'application</h2>
 
 <div class="card">
+<p>On enveloppe notre application avec le Provider pour que tous les composants puissent accéder au contexte.</p>
 
 <code>
-// main.jsx
+// src/main.jsx
 
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { UserProvider } from "./context/UserProvider";
 
-/*
-On enveloppe toute l'application avec le Provider
-*/
+// On enveloppe App avec UserProvider
 ReactDOM.createRoot(document.getElementById("root")).render(
     &lt;UserProvider&gt;
         &lt;App /&gt;
@@ -185,17 +210,17 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 );
 </code>
 
-<p>
-Tous les composants enfants peuvent maintenant accéder au contexte.
-</p>
-
+<p>Explication :</p>
+<ul>
+<li>Tout ce qui est dans &lt;App /&gt; pourra accéder au contexte utilisateur</li>
+<li>Pas besoin de passer user ou setUser via props</li>
+</ul>
 </div>
 
----
-
-<h2>6. Exemple 4 — Utilisation du contexte</h2>
+<h2>6. Exemple 4 : utiliser le contexte dans un composant</h2>
 
 <div class="card">
+<p>Maintenant, un composant peut consommer le contexte pour afficher le nom de l’utilisateur.</p>
 
 <code>
 // src/components/Profile.jsx
@@ -203,11 +228,8 @@ Tous les composants enfants peuvent maintenant accéder au contexte.
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 
-const Profile = () => {
-
-    /*
-    useContext permet de récupérer les données globales
-    */
+const Profile = () =&gt; {
+    // On récupère les données du contexte
     const { user } = useContext(UserContext);
 
     return (
@@ -224,13 +246,18 @@ const Profile = () => {
 export default Profile;
 </code>
 
+<p>Explication :</p>
+<ul>
+<li><strong>useContext(UserContext)</strong> : récupère l’état global</li>
+<li>Si user existe → affiche le nom</li>
+<li>Sinon → affiche "Non connecté"</li>
+</ul>
 </div>
 
----
-
-<h2>7. Exemple 5 — Connexion utilisateur (interaction)</h2>
+<h2>7. Exemple 5 : mettre à jour l'utilisateur (connexion)</h2>
 
 <div class="card">
+<p>On crée un bouton pour simuler la connexion d’un utilisateur.</p>
 
 <code>
 // src/components/Login.jsx
@@ -238,15 +265,12 @@ export default Profile;
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 
-const Login = () => {
+const Login = () =&gt; {
 
-    const { setUser } = useContext(UserContext);
+    const { setUser } = useContext(UserContext); // on récupère la fonction pour mettre à jour user
 
-    const handleLogin = () => {
-
-        /*
-        Simulation connexion utilisateur
-        */
+    const handleLogin = () =&gt; {
+        // Simulation de connexion : on définit un utilisateur
         setUser({
             name: "John Doe",
             email: "john@mail.com"
@@ -263,30 +287,27 @@ const Login = () => {
 export default Login;
 </code>
 
-<p><strong>Résultat :</strong></p>
+<p>Explications :</p>
 <ul>
-<li>clic → utilisateur défini globalement</li>
-<li>tous les composants reçoivent la mise à jour</li>
+<li>setUser est appelée pour définir les informations utilisateur</li>
+<li>Tous les composants consommant le contexte se mettent à jour automatiquement</li>
+<li>Exemple simple mais montre le flux global de données</li>
 </ul>
-
 </div>
 
----
-
-<h2>8. Bonnes pratiques</h2>
+<h2>8. Bonnes pratiques pour débutants</h2>
 
 <div class="card">
 <ul>
-<li>Séparer Context et Provider</li>
-<li>Limiter le nombre de contexts</li>
-<li>Utiliser des hooks personnalisés</li>
-<li>Ne pas surcharger le context</li>
+<li>Séparer Context et Provider pour plus de clarté</li>
+<li>Ne pas surcharger un contexte avec trop de données</li>
+<li>Créer des hooks personnalisés si nécessaire pour simplifier l'accès au contexte</li>
+<li>Utiliser useContext pour des états globaux simples (user, thème, paramètres)</li>
+<li>Pour des états complexes, envisager Redux ou Zustand</li>
 </ul>
 </div>
 
----
-
-<h2>9. Architecture recommandée</h2>
+<h2>9. Structure finale recommandée</h2>
 
 <div class="card">
 <code>
@@ -294,22 +315,20 @@ src/
  ├── context/
  │    ├── UserContext.jsx
  │    ├── UserProvider.jsx
- │
  ├── components/
  │    ├── Login.jsx
  │    ├── Profile.jsx
+ ├── App.jsx
+ ├── main.jsx
 </code>
 </div>
 
----
-
-<h2>10. Conclusion</h2>
+<h2>10. Résultat attendu</h2>
 
 <div class="highlight">
-useContext est une solution simple et efficace pour gérer l’état global dans des applications React de taille moyenne.
+Au clic sur "Se connecter", l’état utilisateur est défini globalement et tous les composants utilisant useContext se mettent à jour automatiquement.
 </div>
 
 </div>
-
 </body>
 </html>
